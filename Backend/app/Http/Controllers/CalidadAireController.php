@@ -134,7 +134,59 @@ class CalidadAireController extends Controller
             ->get();
 
         return response()->json($datos);
+    }
+    
+    public function since(Request $request)
+    {
+        $since = $request->query('since');
+        if (!$since) {
+            return $this->allRecords();
+        }
+
+        $datos = DB::table('registros_calidad_aire')
+            ->where('fecha_hora', '>', $since)
+            ->orderBy('fecha_hora', 'asc')
+            ->get();
+
+        return response()->json($datos);
+    }
+
+
+
+    public function ByDate(Request $request)
+{
+    $date = $request->query('date'); // YYYY-MM-DD
+    $start = $date . ' 00:00:00';
+    $end   = $date . ' 23:59:59';
+
+    $records = DB::table('registros_calidad_aire')
+        ->whereBetween('fecha_hora', [$start, $end])
+        ->orderBy('fecha_hora', 'asc')
+        ->get();
+
+    return response()->json($records);
 }
+
+      
+    public function LatestByDate(Request $request) {
+    $date = $request->query('date'); // YYYY-MM-DD
+    $limit = $request->query('limit', 10);
+
+    $start = $date . ' 00:00:00';
+    $end = $date . ' 23:59:59';
+
+    $records = DB::table('registros_calidad_aire') // ✅ tabla correcta
+        ->whereBetween('fecha_hora', [$start, $end])
+        ->orderBy('fecha_hora', 'desc')
+        ->limit($limit)
+        ->get();
+
+    return response()->json($records);
+}
+
+
+
+
 }
 
 
